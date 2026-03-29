@@ -1,1 +1,295 @@
-hello
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sachin Shakya | BIT Student Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #60a5fa 0%, #a855f7 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-link {
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background: #60a5fa;
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .float-animation {
+            animation: float 4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="selection:bg-blue-500/30">
+
+    <!-- Navbar -->
+    <nav class="fixed top-0 w-full z-50 transition-all duration-300 px-6 py-4" id="navbar">
+        <div class="max-w-7xl mx-auto flex justify-between items-center glass rounded-2xl px-6 py-3">
+            <div class="text-xl font-bold tracking-tight">
+                <span class="gradient-text">SACHIN.</span>
+            </div>
+            
+            <!-- Desktop Nav -->
+            <div class="hidden md:flex space-x-8 font-medium text-sm">
+                <a href="#home" class="nav-link hover:text-blue-400">Home</a>
+                <a href="#about" class="nav-link hover:text-blue-400">About</a>
+                <a href="#projects" class="nav-link hover:text-blue-400">Projects</a>
+                <a href="#contact" class="nav-link hover:text-blue-400">Contact</a>
+            </div>
+
+            <button class="md:hidden p-2" id="mobile-menu-btn">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="hidden absolute top-20 left-6 right-6 glass rounded-2xl p-6 flex-col space-y-4 md:hidden">
+            <a href="#home" class="block py-2 text-center border-b border-white/5">Home</a>
+            <a href="#about" class="block py-2 text-center border-b border-white/5">About</a>
+            <a href="#projects" class="block py-2 text-center border-b border-white/5">Projects</a>
+            <a href="#contact" class="block py-2 text-center">Contact</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden relative">
+        <!-- Background Decorations -->
+        <div class="absolute top-1/4 -left-20 w-72 h-72 bg-blue-600/20 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-1/4 -right-20 w-72 h-72 bg-purple-600/20 rounded-full blur-[120px]"></div>
+
+        <div class="max-w-5xl mx-auto text-center z-10">
+            <div class="inline-block px-4 py-1.5 mb-6 glass rounded-full text-xs font-semibold tracking-widest text-blue-400 uppercase">
+                BIT Student @ KIST
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
+                Hi, I'm <span class="gradient-text">Sachin Shakya</span>
+            </h1>
+            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+                Aspiring Software Engineer currently pursuing Bachelor in Information Technology. 
+                Focusing on logic building, data structures, and foundational programming.
+            </p>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <a href="#projects" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-600/20">
+                    View Projects
+                </a>
+                <a href="#contact" class="px-8 py-4 glass hover:bg-white/10 text-white rounded-xl font-semibold transition-all">
+                    Get in Touch
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 px-6 relative bg-slate-900/50">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="text-3xl font-bold mb-6">Education & Background</h2>
+                    <p class="text-gray-400 mb-6 leading-relaxed">
+                        I am currently a 3rd Semester student of **BIT at KIST College**, affiliated with **Purbanchal University**. During my first year, I've focused on mastering the fundamentals of computer science through C and C++.
+                    </p>
+                    <div class="space-y-4 mb-8">
+                        <div class="p-4 glass rounded-xl border-l-4 border-blue-500">
+                            <h4 class="font-bold text-white">Bachelor in IT</h4>
+                            <p class="text-sm text-gray-400 uppercase tracking-wider">KIST College | 3rd Semester Running</p>
+                        </div>
+                        <div class="p-4 glass rounded-xl border-l-4 border-purple-500">
+                            <h4 class="font-bold text-white">Programming Basics</h4>
+                            <p class="text-sm text-gray-400 uppercase tracking-wider">C & C++ Fundamentals</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-4">
+                        <div class="p-6 glass rounded-2xl float-animation">
+                            <i data-lucide="terminal" class="text-blue-400 mb-3"></i>
+                            <h3 class="font-bold">C Programming</h3>
+                            <p class="text-sm text-gray-400">1st Semester Foundations</p>
+                        </div>
+                        <div class="p-6 glass rounded-2xl">
+                            <i data-lucide="cpu" class="text-purple-400 mb-3"></i>
+                            <h3 class="font-bold">C++</h3>
+                            <p class="text-sm text-gray-400">Object Oriented Logic</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4 mt-8">
+                        <div class="p-6 glass rounded-2xl">
+                            <i data-lucide="book-open" class="text-green-400 mb-3"></i>
+                            <h3 class="font-bold">BIT Curriculum</h3>
+                            <p class="text-sm text-gray-400">Purbanchal University</p>
+                        </div>
+                        <div class="p-6 glass rounded-2xl float-animation" style="animation-delay: 1s;">
+                            <i data-lucide="binary" class="text-pink-400 mb-3"></i>
+                            <h3 class="font-bold">Logic Building</h3>
+                            <p class="text-sm text-gray-400">Problem Solving Skills</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-24 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold mb-2">My Academic Projects</h2>
+                <p class="text-gray-400">Hands-on applications built during my first year of BIT.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl">
+                <!-- Project 1 -->
+                <div class="group relative glass rounded-2xl overflow-hidden p-8 border border-white/5 hover:border-blue-500/30 transition-all">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-blue-600/20 rounded-lg">
+                            <i data-lucide="code" class="text-blue-400"></i>
+                        </div>
+                        <span class="text-[10px] bg-white/10 px-2 py-1 rounded-full uppercase tracking-tighter">1st Semester</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">C Programming Project</h3>
+                    <p class="text-sm text-gray-400 mb-6 leading-relaxed">
+                        A fundamental project focused on structural programming, file handling, and basic console-based logic implemented using C.
+                    </p>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 text-[11px] bg-blue-500/10 text-blue-400 rounded-full font-semibold border border-blue-500/20">C Language</span>
+                    </div>
+                </div>
+
+                <!-- Project 2 -->
+                <div class="group relative glass rounded-2xl overflow-hidden p-8 border border-white/5 hover:border-purple-500/30 transition-all">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="p-3 bg-purple-600/20 rounded-lg">
+                            <i data-lucide="layers" class="text-purple-400"></i>
+                        </div>
+                        <span class="text-[10px] bg-white/10 px-2 py-1 rounded-full uppercase tracking-tighter">2nd Semester</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">C++ OOP Project</h3>
+                    <p class="text-sm text-gray-400 mb-6 leading-relaxed">
+                        An object-oriented application exploring classes, inheritance, and polymorphism to solve real-world logic problems.
+                    </p>
+                    <div class="flex gap-2">
+                        <span class="px-3 py-1 text-[11px] bg-purple-500/10 text-purple-400 rounded-full font-semibold border border-purple-500/20">C++</span>
+                        <span class="px-3 py-1 text-[11px] bg-purple-500/10 text-purple-400 rounded-full font-semibold border border-purple-500/20">OOP</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 px-6 relative">
+        <div class="max-w-4xl mx-auto">
+            <div class="glass rounded-3xl p-8 md:p-12 overflow-hidden relative">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-600/20 rounded-full blur-3xl"></div>
+                
+                <div class="text-center mb-12">
+                    <h2 class="text-4xl font-bold mb-4">Get In Touch</h2>
+                    <p class="text-gray-400">Feel free to reach out for collaborations or queries.</p>
+                </div>
+
+                <form class="space-y-6" id="contact-form">
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-sm text-gray-400 ml-1">Name</label>
+                            <input type="text" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-blue-500 focus:outline-none transition-colors" placeholder="Sachin Shakya">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-sm text-gray-400 ml-1">Email</label>
+                            <input type="email" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-blue-500 focus:outline-none transition-colors" placeholder="yourname@gmail.com">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm text-gray-400 ml-1">Message</label>
+                        <textarea rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-blue-500 focus:outline-none transition-colors" placeholder="Hi Sachin, I'd like to connect..."></textarea>
+                    </div>
+                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2">
+                        <span>Send Message</span>
+                        <i data-lucide="send" class="w-5 h-5"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 border-t border-white/5 text-center">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col items-center">
+            <div class="flex space-x-6 mb-8">
+                <a href="#" class="p-3 glass rounded-full hover:text-blue-400 transition-colors"><i data-lucide="github"></i></a>
+                <a href="#" class="p-3 glass rounded-full hover:text-blue-400 transition-colors"><i data-lucide="linkedin"></i></a>
+                <a href="#" class="p-3 glass rounded-full hover:text-blue-400 transition-colors"><i data-lucide="mail"></i></a>
+            </div>
+            <p class="text-gray-500 text-sm">
+                &copy; 2026 Sachin Shakya | BIT Student at KIST
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        
+        menuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            mobileMenu.classList.toggle('flex');
+        });
+
+        // Form Submit Handler
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = 'Sent Successfully!';
+            btn.classList.replace('bg-blue-600', 'bg-emerald-600');
+            e.target.reset();
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.classList.replace('bg-emerald-600', 'bg-blue-600');
+                lucide.createIcons();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
