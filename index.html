@@ -1,295 +1,319 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sachin Shakya | BIT Student Portfolio</title>
+    <title>Sachin Shakya | Portfolio</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.0/lucide.min.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            color: #f1f5f9;
+            scroll-behavior: smooth;
         }
 
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
         }
 
-        .gradient-text {
-            background: linear-gradient(135deg, #60a5fa 0%, #a855f7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .nav-link {
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .nav-link::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            bottom: -4px;
-            left: 0;
-            background: #60a5fa;
-            transition: width 0.3s ease;
-        }
-
-        .nav-link:hover::after {
-            width: 100%;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-            100% { transform: translateY(0px); }
-        }
-
-        .float-animation {
-            animation: float 4s ease-in-out infinite;
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
     </style>
 </head>
-<body class="selection:bg-blue-500/30">
+<body class="bg-slate-900 text-slate-200 selection:bg-sky-500/30">
 
-    <!-- Navbar -->
-    <nav class="fixed top-0 w-full z-50 transition-all duration-300 px-6 py-4" id="navbar">
-        <div class="max-w-7xl mx-auto flex justify-between items-center glass rounded-2xl px-6 py-3">
-            <div class="text-xl font-bold tracking-tight">
-                <span class="gradient-text">SACHIN.</span>
+    <!-- ==========================================
+         PORTFOLIO CONFIGURATION - EDIT HERE
+         ========================================== -->
+    <script>
+        const PORTFOLIO_DATA = {
+            profile: {
+                name: "Sachin Shakya",
+                title: "IT Student & Creative Developer",
+                image: "Me.jpg",
+                bio: "Building high-performance web applications and smart IoT solutions. Specializing in Web Development, Microcontrollers, and Embedded Systems.",
+                email: "sachinshakya202np@gmail.com",
+                location: "Kathmandu, Nepal",
+                socials: [
+                    { name: "github", url: "https://github.com/SachinShakya79" },
+                    { name: "linkedin", url: "https://linkedin.com" },
+                    { name: "mail", url: "mailto:sachinshakya202np@gmail.com" }
+                ]
+            },
+            projects: [
+                {
+                    id: "project-1",
+                    title: "CMUSE (C Music Library)",
+                    category: "C Programming / Systems",
+                    shortDesc: "A terminal-based music library with role-based access, file persistence, and VLC integration.",
+                    fullDesc: "CMUSE is a comprehensive console application that demonstrates advanced C programming concepts. \n\nKey Highlights:\n1. File Handling: Implemented binary file storage for users and music data to ensure zero data loss.\n2. Custom Controls: Built a 'WASD' navigation system to improve the traditional CLI user experience.\n3. Security: Integrated password masking and account validation logic.\n4. Hardware/Software link: Integrated system commands to trigger VLC media player for audio playback.\n\nThis project showcases my ability to handle complex logic, data structures, and system-level interactions in a low-level language.",
+                    tech: ["C", "File I/O", "Data Structures", "CLI Design"],
+                    image: "Cmuse Image.png",
+                    liveUrl: "CMUSE Real.png",
+                    githubUrl: "https://github.com/Gitzen001/Project-C-Muse",
+                },
+                {
+                    id: "project-2",
+                    title: "Firm Bill Generator (C++ Project)",
+                    category: "C++ / OOP / Systems",
+                    shortDesc: "A professional business management tool featuring Multi-Shop support, real-time inventory tracking, and automated invoicing.",
+                    fullDesc: "Firm Bill Generator is an advanced C++ application designed for real-world business utility. \n\nKey Technical Highlights:\n1. Multi-Tenant Architecture: Developed logic to manage separate business data in isolated directories using OS-level commands.\n2. Robust OOP Design: Utilized classes and structs to manage complex relationships between Products, Customers, and Invoices.\n3. Financial Logic: Implemented precise calculation engines for Tax/VAT, automated discounts, and subtotaling.\n4. Credit Management: Built an 'Unpaid Bills' tracking system to help businesses manage accounts receivable.\n5. UX Optimization: Integrated arrow-key navigation and processing animations to bridge the gap between CLI and GUI experiences.",
+                    tech: ["C++", "OOP", "File Handling", "System Architecture"],
+                    image: "Firm Bill Generator.png",
+                    liveUrl: "FirmBillGenerator Real.png",
+                    githubUrl: "https://github.com/SachinShakya79/Firm-Bill-Generator-CPP-project",
+                },
+                {
+                    id: "project-3",
+                    title: "HidCombat (Kistfare Project)",
+                    category: "IoT / Embedded Systems",
+                    shortDesc: "A web based game with esp32 microcontroller as a controller. Players can connect to the game via Wi-Fi and use the microcontroller's buttons and sensors to interact with the game.",
+                    fullDesc: "HiD Combat is an innovative project that merges embedded systems with web-based gaming. \n\nKey Technical Highlights:\n1. ESP32 Microcontroller: Leveraged the ESP32's Wi-Fi capabilities to create a seamless connection between hardware and a web application.\n2. WebSocket Communication: Implemented real-time bidirectional communication between the microcontroller and the game server for responsive gameplay.\n3. Game Development: Designed a simple yet engaging web game that responds to physical inputs from the ESP32, demonstrating my ability to integrate hardware with software for interactive experiences.\n4. Cross-Platform Compatibility: Ensured that the game can be accessed from any device with a web browser, making it widely accessible.",
+                    tech: ["ESP32", "Microcontroller Programming", "WebSocket Communication", "Game Development"],
+                    image: "HiDCombat.png",
+                    liveUrl: "HidCombat real.jpg",
+                    githubUrl: "https://github.com/SachinShakya79/ESP32-Gamepad-project/",
+                },
+        
+
+//More Projects can be added here by following the same structure as above:
+//=================================>
+
+            ],
+            skills: ["C/C++", "Microcontrollers* (basic)", "Web Development* (basic)",  "Problem Solving", "Team Collaboration",]
+        };
+    </script>
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="text-xl font-bold bg-gradient-to-r from-sky-400 to-blue-500 bg-clip-text text-transparent cursor-pointer" onclick="navigateTo('home')">
+                SACHIN.
             </div>
-            
-            <!-- Desktop Nav -->
-            <div class="hidden md:flex space-x-8 font-medium text-sm">
-                <a href="#home" class="nav-link hover:text-blue-400">Home</a>
-                <a href="#about" class="nav-link hover:text-blue-400">About</a>
-                <a href="#projects" class="nav-link hover:text-blue-400">Projects</a>
-                <a href="#contact" class="nav-link hover:text-blue-400">Contact</a>
+            <div class="flex gap-8 text-sm font-medium text-slate-400">
+                <button onclick="navigateTo('home')" class="nav-link capitalize hover:text-sky-400 transition-colors">home</button>
+                <button onclick="navigateTo('projects')" class="nav-link capitalize hover:text-sky-400 transition-colors">projects</button>
+                <button onclick="navigateTo('about')" class="nav-link capitalize hover:text-sky-400 transition-colors">about</button>
+                <button onclick="navigateTo('contact')" class="nav-link capitalize hover:text-sky-400 transition-colors">contact</button>
             </div>
-
-            <button class="md:hidden p-2" id="mobile-menu-btn">
-                <i data-lucide="menu"></i>
-            </button>
-        </div>
-
-        <!-- Mobile Menu Overlay -->
-        <div id="mobile-menu" class="hidden absolute top-20 left-6 right-6 glass rounded-2xl p-6 flex-col space-y-4 md:hidden">
-            <a href="#home" class="block py-2 text-center border-b border-white/5">Home</a>
-            <a href="#about" class="block py-2 text-center border-b border-white/5">About</a>
-            <a href="#projects" class="block py-2 text-center border-b border-white/5">Projects</a>
-            <a href="#contact" class="block py-2 text-center">Contact</a>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section id="home" class="min-h-screen flex items-center justify-center pt-20 px-6 overflow-hidden relative">
-        <!-- Background Decorations -->
-        <div class="absolute top-1/4 -left-20 w-72 h-72 bg-blue-600/20 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-1/4 -right-20 w-72 h-72 bg-purple-600/20 rounded-full blur-[120px]"></div>
-
-        <div class="max-w-5xl mx-auto text-center z-10">
-            <div class="inline-block px-4 py-1.5 mb-6 glass rounded-full text-xs font-semibold tracking-widest text-blue-400 uppercase">
-                BIT Student @ KIST
-            </div>
-            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 leading-tight">
-                Hi, I'm <span class="gradient-text">Sachin Shakya</span>
-            </h1>
-            <p class="text-gray-400 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
-                Aspiring Software Engineer currently pursuing Bachelor in Information Technology. 
-                Focusing on logic building, data structures, and foundational programming.
-            </p>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="#projects" class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-blue-600/20">
-                    View Projects
-                </a>
-                <a href="#contact" class="px-8 py-4 glass hover:bg-white/10 text-white rounded-xl font-semibold transition-all">
-                    Get in Touch
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-24 px-6 relative bg-slate-900/50">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid md:grid-cols-2 gap-16 items-center">
-                <div>
-                    <h2 class="text-3xl font-bold mb-6">Education & Background</h2>
-                    <p class="text-gray-400 mb-6 leading-relaxed">
-                        I am currently a 3rd Semester student of **BIT at KIST College**, affiliated with **Purbanchal University**. During my first year, I've focused on mastering the fundamentals of computer science through C and C++.
-                    </p>
-                    <div class="space-y-4 mb-8">
-                        <div class="p-4 glass rounded-xl border-l-4 border-blue-500">
-                            <h4 class="font-bold text-white">Bachelor in IT</h4>
-                            <p class="text-sm text-gray-400 uppercase tracking-wider">KIST College | 3rd Semester Running</p>
-                        </div>
-                        <div class="p-4 glass rounded-xl border-l-4 border-purple-500">
-                            <h4 class="font-bold text-white">Programming Basics</h4>
-                            <p class="text-sm text-gray-400 uppercase tracking-wider">C & C++ Fundamentals</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-4">
-                        <div class="p-6 glass rounded-2xl float-animation">
-                            <i data-lucide="terminal" class="text-blue-400 mb-3"></i>
-                            <h3 class="font-bold">C Programming</h3>
-                            <p class="text-sm text-gray-400">1st Semester Foundations</p>
-                        </div>
-                        <div class="p-6 glass rounded-2xl">
-                            <i data-lucide="cpu" class="text-purple-400 mb-3"></i>
-                            <h3 class="font-bold">C++</h3>
-                            <p class="text-sm text-gray-400">Object Oriented Logic</p>
-                        </div>
-                    </div>
-                    <div class="space-y-4 mt-8">
-                        <div class="p-6 glass rounded-2xl">
-                            <i data-lucide="book-open" class="text-green-400 mb-3"></i>
-                            <h3 class="font-bold">BIT Curriculum</h3>
-                            <p class="text-sm text-gray-400">Purbanchal University</p>
-                        </div>
-                        <div class="p-6 glass rounded-2xl float-animation" style="animation-delay: 1s;">
-                            <i data-lucide="binary" class="text-pink-400 mb-3"></i>
-                            <h3 class="font-bold">Logic Building</h3>
-                            <p class="text-sm text-gray-400">Problem Solving Skills</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projects" class="py-24 px-6">
-        <div class="max-w-7xl mx-auto">
-            <div class="mb-12">
-                <h2 class="text-3xl font-bold mb-2">My Academic Projects</h2>
-                <p class="text-gray-400">Hands-on applications built during my first year of BIT.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl">
-                <!-- Project 1 -->
-                <div class="group relative glass rounded-2xl overflow-hidden p-8 border border-white/5 hover:border-blue-500/30 transition-all">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-blue-600/20 rounded-lg">
-                            <i data-lucide="code" class="text-blue-400"></i>
-                        </div>
-                        <span class="text-[10px] bg-white/10 px-2 py-1 rounded-full uppercase tracking-tighter">1st Semester</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">C Programming Project</h3>
-                    <p class="text-sm text-gray-400 mb-6 leading-relaxed">
-                        A fundamental project focused on structural programming, file handling, and basic console-based logic implemented using C.
-                    </p>
-                    <div class="flex gap-2">
-                        <span class="px-3 py-1 text-[11px] bg-blue-500/10 text-blue-400 rounded-full font-semibold border border-blue-500/20">C Language</span>
-                    </div>
-                </div>
-
-                <!-- Project 2 -->
-                <div class="group relative glass rounded-2xl overflow-hidden p-8 border border-white/5 hover:border-purple-500/30 transition-all">
-                    <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-purple-600/20 rounded-lg">
-                            <i data-lucide="layers" class="text-purple-400"></i>
-                        </div>
-                        <span class="text-[10px] bg-white/10 px-2 py-1 rounded-full uppercase tracking-tighter">2nd Semester</span>
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">C++ OOP Project</h3>
-                    <p class="text-sm text-gray-400 mb-6 leading-relaxed">
-                        An object-oriented application exploring classes, inheritance, and polymorphism to solve real-world logic problems.
-                    </p>
-                    <div class="flex gap-2">
-                        <span class="px-3 py-1 text-[11px] bg-purple-500/10 text-purple-400 rounded-full font-semibold border border-purple-500/20">C++</span>
-                        <span class="px-3 py-1 text-[11px] bg-purple-500/10 text-purple-400 rounded-full font-semibold border border-purple-500/20">OOP</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-24 px-6 relative">
-        <div class="max-w-4xl mx-auto">
-            <div class="glass rounded-3xl p-8 md:p-12 overflow-hidden relative">
-                <div class="absolute -top-10 -right-10 w-40 h-40 bg-blue-600/20 rounded-full blur-3xl"></div>
-                
-                <div class="text-center mb-12">
-                    <h2 class="text-4xl font-bold mb-4">Get In Touch</h2>
-                    <p class="text-gray-400">Feel free to reach out for collaborations or queries.</p>
-                </div>
-
-                <form class="space-y-6" id="contact-form">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="text-sm text-gray-400 ml-1">Name</label>
-                            <input type="text" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-blue-500 focus:outline-none transition-colors" placeholder="Sachin Shakya">
-                        </div>
-                        <div class="space-y-2">
-                            <label class="text-sm text-gray-400 ml-1">Email</label>
-                            <input type="email" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-blue-500 focus:outline-none transition-colors" placeholder="yourname@gmail.com">
-                        </div>
-                    </div>
-                    <div class="space-y-2">
-                        <label class="text-sm text-gray-400 ml-1">Message</label>
-                        <textarea rows="4" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-blue-500 focus:outline-none transition-colors" placeholder="Hi Sachin, I'd like to connect..."></textarea>
-                    </div>
-                    <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2">
-                        <span>Send Message</span>
-                        <i data-lucide="send" class="w-5 h-5"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </section>
+    <!-- Main Content Container -->
+    <main id="app-content" class="min-h-screen pt-16">
+        <!-- Content injected by JavaScript -->
+    </main>
 
     <!-- Footer -->
-    <footer class="py-12 border-t border-white/5 text-center">
-        <div class="max-w-7xl mx-auto px-6 flex flex-col items-center">
-            <div class="flex space-x-6 mb-8">
-                <a href="#" class="p-3 glass rounded-full hover:text-blue-400 transition-colors"><i data-lucide="github"></i></a>
-                <a href="#" class="p-3 glass rounded-full hover:text-blue-400 transition-colors"><i data-lucide="linkedin"></i></a>
-                <a href="#" class="p-3 glass rounded-full hover:text-blue-400 transition-colors"><i data-lucide="mail"></i></a>
-            </div>
-            <p class="text-gray-500 text-sm">
-                &copy; 2026 Sachin Shakya | BIT Student at KIST
-            </p>
-        </div>
+    <footer class="py-12 border-t border-slate-800 text-center text-slate-500 text-sm">
+        <p id="footer-copy"></p>
+        <p class="mt-2">Built with HTML, Tailwind CSS & JS</p>
     </footer>
 
     <script>
-        lucide.createIcons();
+        // --- Router Logic ---
+        function navigateTo(page, projectId = null) {
+            const content = document.getElementById('app-content');
+            content.innerHTML = ''; // Clear current content
+            window.scrollTo(0, 0);
 
-        const menuBtn = document.getElementById('mobile-menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-        
-        menuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-            mobileMenu.classList.toggle('flex');
-        });
+            if (page === 'home') renderHome();
+            else if (page === 'projects') renderProjects();
+            else if (page === 'about') renderAbout();
+            else if (page === 'contact') renderContact();
+            else if (page === 'project-detail') renderProjectDetail(projectId);
 
-        // Form Submit Handler
-        document.getElementById('contact-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const btn = e.target.querySelector('button');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = 'Sent Successfully!';
-            btn.classList.replace('bg-blue-600', 'bg-emerald-600');
-            e.target.reset();
-            setTimeout(() => {
-                btn.innerHTML = originalContent;
-                btn.classList.replace('bg-emerald-600', 'bg-blue-600');
-                lucide.createIcons();
-            }, 3000);
-        });
+            // Update Nav Active State
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.toggle('text-sky-400', link.innerText.toLowerCase() === page);
+            });
+            
+            // Re-initialize icons
+            lucide.createIcons();
+        }
+
+        // --- Render Functions ---
+
+        function renderHome() {
+            const app = document.getElementById('app-content');
+            app.innerHTML = `
+                <div class="fade-in">
+                    <section class="pt-32 pb-20 px-6 max-w-6xl mx-auto text-center">
+                        <div class="inline-block px-4 py-1.5 mb-6 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-400 text-sm font-medium">
+                            Available for new opportunities
+                        </div>
+                        <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight text-white">
+                            Hi, I'm <span class="text-sky-400">${PORTFOLIO_DATA.profile.name.split(' ')[0]}</span>
+                        </h1>
+                        <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+                            ${PORTFOLIO_DATA.profile.bio}
+                        </p>
+                        <div class="flex justify-center gap-4">
+                            <button onclick="navigateTo('projects')" class="px-8 py-3 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-full transition-all shadow-lg shadow-sky-500/25">View My Work</button>
+                            <button onclick="navigateTo('contact')" class="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-full border border-slate-700 transition-all">Get In Touch</button>
+                        </div>
+                    </section>
+
+                    <section class="py-20 px-6 max-w-6xl mx-auto">
+                        <div class="flex justify-between items-end mb-12">
+                            <div>
+                                <h2 class="text-3xl font-bold text-white mb-2">Featured Projects</h2>
+                                <p class="text-slate-400">Favorite things I've built recently.</p>
+                            </div>
+                            <button onclick="navigateTo('projects')" class="hidden md:flex items-center text-sky-400 font-semibold hover:underline">
+                                View All Projects <i data-lucide="chevron-right" class="ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            ${PORTFOLIO_DATA.projects.slice(0, 3).map(p => createProjectCard(p)).join('')}
+                        </div>
+                    </section>
+                </div>
+            `;
+        }
+
+        function renderProjects() {
+            const app = document.getElementById('app-content');
+            app.innerHTML = `
+                <section class="pt-24 pb-20 px-6 max-w-6xl mx-auto fade-in">
+                    <h2 class="text-4xl font-bold text-white mb-4 text-center">My Projects</h2>
+                    <p class="text-slate-400 text-center mb-16 max-w-xl mx-auto">A complete list of my technical and creative experiments.</p>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        ${PORTFOLIO_DATA.projects.map(p => createProjectCard(p)).join('')}
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderProjectDetail(id) {
+            const project = PORTFOLIO_DATA.projects.find(p => p.id === id);
+            const app = document.getElementById('app-content');
+            app.innerHTML = `
+                <div class="pt-12 pb-20 px-6 max-w-4xl mx-auto fade-in">
+                    <button onclick="navigateTo('projects')" class="flex items-center text-slate-400 hover:text-white mb-8 transition-colors">
+                        <i data-lucide="arrow-left" class="mr-2"></i> Back to projects
+                    </button>
+                    <div class="rounded-3xl overflow-hidden mb-10 shadow-2xl">
+                        <img src="${project.image}" class="w-full h-auto max-h-[500px] object-cover" />
+                    </div>
+                    <div class="grid md:grid-cols-3 gap-10">
+                        <div class="md:col-span-2">
+                            <h1 class="text-4xl font-bold text-slate-100 mb-4">${project.title}</h1>
+                            <div class="flex flex-wrap gap-2 mb-6">
+                                ${project.tech.map(t => `<span class="px-3 py-1 bg-slate-800 rounded-full text-xs text-slate-300 border border-slate-700">${t}</span>`).join('')}
+                            </div>
+                            <p class="text-slate-300 leading-relaxed text-lg">${project.fullDesc}</p>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                                <h4 class="text-slate-100 font-bold mb-4">Project Links</h4>
+                                <div class="space-y-3">
+                                    <a href="${project.liveUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3 bg-sky-500 hover:bg-sky-400 text-white rounded-xl transition-colors">
+                                        <span>Live Preview</span> <i data-lucide="external-link" size="18"></i>
+                                    </a>
+                                    <a href="${project.githubUrl}" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between p-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl transition-colors">
+                                        <span>View Code</span> <i data-lucide="github" size="18"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAbout() {
+            const app = document.getElementById('app-content');
+            app.innerHTML = `
+                <section class="pt-24 pb-20 px-6 max-w-4xl mx-auto fade-in">
+                    <div class="grid md:grid-cols-3 gap-12 items-start">
+                        <div class="aspect-square rounded-2xl overflow-hidden border-2 border-slate-800 bg-slate-800">
+                            <img src="${PORTFOLIO_DATA.profile.image}" alt="Profile" class="w-full h-full object-cover">
+                            </div>
+                        <div class="md:col-span-2">
+                            <h2 class="text-4xl font-bold text-white mb-6">About Me</h2>
+                            <div class="space-y-4 text-slate-300 text-lg">
+                                <p>I am a passionate creator based in ${PORTFOLIO_DATA.profile.location}. My journey started with a fascination for Microcontrollers and IoT.</p>
+                                <p>I spend my time balancing between building web applications and implementing embedded solutions.</p>
+                                <div class="pt-6">
+                                    <h4 class="text-white font-bold mb-4">Core Skills</h4>
+                                    <div class="flex flex-wrap gap-2">
+                                        ${PORTFOLIO_DATA.skills.map(s => `<span class="px-4 py-2 bg-slate-800 rounded-xl text-sky-400 text-sm font-medium border border-slate-700">${s}</span>`).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        function renderContact() {
+            const app = document.getElementById('app-content');
+            app.innerHTML = `
+                <section class="pt-24 pb-20 px-6 max-w-2xl mx-auto fade-in text-center">
+                    <h2 class="text-4xl font-bold text-white mb-4">Let's Talk</h2>
+                    <p class="text-slate-400 mb-12">Interested in collaborating or just want to say hi?</p>
+                    <div class="bg-slate-800/50 p-8 rounded-3xl border border-slate-700 shadow-xl text-left">
+                        <div class="grid gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-2">Full Name</label>
+                                <input type="text" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 text-white" placeholder="John Doe">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-2">Email Address</label>
+                                <input type="email" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 text-white" placeholder="john@example.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-400 mb-2">Message</label>
+                                <textarea rows="4" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-sky-500 text-white" placeholder="Tell me about your project..."></textarea>
+                            </div>
+                            <button class="flex items-center justify-center gap-2 w-full py-4 bg-sky-500 hover:bg-sky-400 text-white font-bold rounded-xl transition-all">
+                                <i data-lucide="send" size="18"></i> Send Message
+                            </button>
+                        </div>
+                    </div>
+                </section>
+            `;
+        }
+
+        // --- Helper: Create Project Card HTML ---
+        function createProjectCard(project) {
+            return `
+                <div onclick="navigateTo('project-detail', '${project.id}')" class="group relative bg-slate-800 rounded-2xl overflow-hidden border border-slate-700 hover:border-sky-500/50 transition-all duration-300 cursor-pointer hover:-translate-y-2 shadow-xl">
+                    <div class="h-48 overflow-hidden">
+                        <img src="${project.image}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                    </div>
+                    <div class="p-6">
+                        <span class="text-xs font-bold text-sky-400 uppercase tracking-widest">${project.category}</span>
+                        <h3 class="text-xl font-bold mt-2 text-slate-100">${project.title}</h3>
+                        <p class="text-slate-400 mt-2 text-sm line-clamp-2">${project.shortDesc}</p>
+                        <div class="flex items-center mt-4 text-sky-400 text-sm font-semibold">
+                            View Project <i data-lucide="chevron-right" class="ml-1 group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Initialization ---
+        window.onload = () => {
+            document.getElementById('footer-copy').innerText = `© ${new Date().getFullYear()} ${PORTFOLIO_DATA.profile.name}. All rights reserved.`;
+            navigateTo('home');
+        };
     </script>
 </body>
 </html>
