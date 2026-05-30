@@ -1,0 +1,2310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OdoWheel Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0f11;
+    --surface: #161719;
+    --surface2: #1e2023;
+    --border: #2a2d32;
+    --border2: #363a40;
+    --accent: #e8ff47;
+    --accent2: #47ffd4;
+    --danger: #ff4d6d;
+    --muted: #6b7280;
+    --text: #f0f2f5;
+    --text2: #9ba3af;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+  }
+
+  /* Noise texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(14,15,17,0.9);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .logo-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-mark svg { width: 18px; height: 18px; color: #0e0f11; }
+
+  .logo-text {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--text);
+  }
+
+  .logo-sub {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    display: block;
+    margin-top: 1px;
+  }
+
+  #header-status {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    padding: 0.3rem 0.75rem;
+    border-radius: 4px;
+    border: 1px solid var(--border2);
+    color: var(--accent);
+    background: rgba(232,255,71,0.06);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: blink 1.4s ease infinite;
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+
+  /* ── Layout ── */
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  @media (max-width: 900px) {
+    main { grid-template-columns: 1fr; }
+  }
+
+  /* ── Left Panel ── */
+  .left-panel {
+    border-right: 1px solid var(--border);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    overflow-y: auto;
+  }
+
+  .panel-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .panel-section-header {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  .panel-section-header .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+
+  .panel-body { padding: 1rem; display: flex; flex-direction: column; gap: 0.875rem; }
+
+  /* ── Form Controls ── */
+  .field-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+  }
+
+  .field-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .input-wrap {
+    position: relative;
+  }
+
+  .input-wrap input[type="number"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 0.5rem 2.5rem 0.5rem 0.75rem;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    font-weight: 700;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .input-wrap input[type="number"]:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(232,255,71,0.1);
+  }
+
+  .input-suffix {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    pointer-events: none;
+  }
+
+  /* ── Range slider ── */
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border2);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  /* ── Preset Buttons ── */
+  .preset-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.375rem;
+  }
+
+  .preset-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    padding: 0.4rem 0;
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+
+  .preset-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .preset-btn.active { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+  /* ── Divider ── */
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 0.25rem 0;
+  }
+
+  /* ── Calibration Tabs ── */
+  .tab-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-btn {
+    padding: 0.65rem 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    border-bottom: 2px solid transparent;
+  }
+
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* ── Action Buttons ── */
+  .btn {
+    padding: 0.55rem 1rem;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    justify-content: center;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border-color: var(--accent);
+  }
+
+  .btn-primary:hover { background: #d4eb3a; }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text2);
+    border-color: var(--border2);
+  }
+
+  .btn-success {
+    background: rgba(71,255,212,0.1);
+    color: var(--accent2);
+    border-color: var(--accent2);
+  }
+
+  .btn-success:hover { background: rgba(71,255,212,0.2); }
+
+  .btn-danger-outline {
+    background: transparent;
+    color: var(--danger);
+    border-color: rgba(255,77,109,0.4);
+  }
+
+  .btn-danger-outline:hover { background: rgba(255,77,109,0.08); }
+
+  .btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .btn-row .btn { flex: 1; }
+
+  /* ── Live Counter Box ── */
+  .live-box {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 0.875rem;
+    text-align: center;
+  }
+
+  .live-box-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.25rem;
+  }
+
+  .live-box-value {
+    font-family: var(--mono);
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .live-box-sub {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+  }
+
+  /* ── Right Panel ── */
+  .right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow-y: auto;
+  }
+
+  /* ── Source & Controls Bar ── */
+  .controls-bar {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .source-toggle {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px;
+    gap: 3px;
+  }
+
+  .source-btn {
+    padding: 0.4rem 0.875rem;
+    border-radius: 4px;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .source-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+  }
+
+  .action-bar-right { display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+  /* ── Stat Cards ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  @media (max-width: 700px) {
+    .stats-grid { grid-template-columns: 1fr; }
+  }
+
+  .stat-card {
+    padding: 1.25rem 1.5rem;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card:last-child { border-right: none; }
+
+  .stat-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .stat-value {
+    font-family: var(--mono);
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .stat-value span { font-size: 0.8rem; color: var(--muted); font-weight: 400; }
+
+  .stat-footer {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 0.5rem;
+    margin-top: 0.25rem;
+  }
+
+  .stat-watermark {
+    position: absolute;
+    right: -0.5rem;
+    bottom: -0.5rem;
+    font-size: 5rem;
+    opacity: 0.04;
+    color: var(--text);
+    line-height: 1;
+    pointer-events: none;
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+
+  /* ── Unit Toggle ── */
+  .unit-bar {
+    padding: 0.75rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .unit-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .unit-group {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .unit-btn {
+    padding: 0.3rem 0.75rem;
+    border-radius: 3px;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--muted);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all 0.12s;
+  }
+
+  .unit-btn.active { background: var(--surface2); color: var(--accent); }
+
+  /* ── Canvas Area ── */
+  .canvas-area {
+    display: grid;
+    grid-template-columns: 1fr 200px;
+    gap: 0;
+    flex: 1;
+    border-bottom: 1px solid var(--border);
+    min-height: 280px;
+  }
+
+  @media (max-width: 700px) {
+    .canvas-area { grid-template-columns: 1fr; }
+  }
+
+  #scroll-zone {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    cursor: ns-resize;
+    user-select: none;
+    background-image:
+      linear-gradient(rgba(42,45,50,0.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(42,45,50,0.5) 1px, transparent 1px);
+    background-size: 24px 24px;
+    transition: background 0.2s;
+    position: relative;
+  }
+
+  #scroll-zone.active-scroll {
+    background-image:
+      linear-gradient(rgba(232,255,71,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(232,255,71,0.07) 1px, transparent 1px);
+  }
+
+  #scroll-zone.active-pointer {
+    background-image:
+      linear-gradient(rgba(71,255,212,0.07) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(71,255,212,0.07) 1px, transparent 1px);
+  }
+
+  .zone-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.875rem;
+    font-size: 1.5rem;
+  }
+
+  #zone-title {
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.375rem;
+  }
+
+  #zone-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    max-width: 280px;
+    line-height: 1.5;
+  }
+
+  .live-badge {
+    margin-top: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.35rem 0.75rem;
+  }
+
+  #live-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: background 0.2s;
+  }
+
+  #live-dot.active { background: var(--accent); animation: blink 1s infinite; }
+
+  /* ── Canvas column ── */
+  .canvas-col {
+    border-left: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    background: var(--surface);
+    gap: 0.75rem;
+  }
+
+  .canvas-col-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  #wheel-canvas {
+    border-radius: 50%;
+    display: block;
+  }
+
+  .spin-direction {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  #spin-dir-val {
+    color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* ── Status Bar ── */
+  .status-bar {
+    padding: 0.6rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  #status-text {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  #formula-text {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  /* ── Calibration Hint Box ── */
+  .hint-box {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 0.75rem;
+    font-size: 0.75rem;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .hint-box ol { padding-left: 1.1rem; }
+  .hint-box li { margin-bottom: 0.2rem; }
+
+  .hint-label {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.375rem;
+  }
+
+  /* ── Smart runs list ── */
+  .runs-list {
+    max-height: 96px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text2);
+  }
+
+  .run-row {
+    display: flex;
+    justify-content: space-between;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.3rem 0.5rem;
+  }
+
+  .run-row .run-label { color: var(--muted); }
+  .run-row .run-val { color: var(--accent); font-weight: 700; }
+
+  .run-summary {
+    background: rgba(71,255,212,0.06);
+    border: 1px solid rgba(71,255,212,0.3);
+    border-radius: 4px;
+    padding: 0.4rem 0.5rem;
+    color: var(--accent2);
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .runs-empty {
+    text-align: center;
+    color: var(--muted);
+    font-style: italic;
+    padding: 0.5rem 0;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+  }
+
+  /* ── Select ── */
+  select {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    outline: none;
+    cursor: pointer;
+  }
+
+  select:focus { border-color: var(--accent); }
+
+  /* ── Ticks counter display ── */
+  .ticks-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .ticks-number-wrap {
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 5px;
+    padding: 0.2rem 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+  }
+
+  .ticks-number-wrap input {
+    width: 3rem;
+    background: transparent;
+    border: none;
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+    outline: none;
+  }
+
+  .ticks-unit {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── Calib status badge ── */
+  #calib-badge-val {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  #calib-desc-val {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    color: var(--muted);
+    line-height: 1.5;
+    margin-top: 0.25rem;
+  }
+
+  /* ── Pointer scan btn ── */
+  #btn-ptr-scan {
+    display: none;
+  }
+
+  /* ── Smart progress ── */
+  .smart-progress-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  #smart-progress-text {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent2);
+    font-weight: 700;
+  }
+
+  #smart-runs-done {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    background: rgba(71,255,212,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(71,255,212,0.25);
+    border-radius: 20px;
+    padding: 0.15rem 0.5rem;
+  }
+
+  /* ── Footer ── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 0.875rem 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--muted);
+    text-align: center;
+    letter-spacing: 0.06em;
+    z-index: 1;
+  }
+
+  /* ── Saved Calibrations ── */
+  .saved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .saved-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 0.5rem 0.625rem;
+    cursor: pointer;
+    transition: border-color 0.12s;
+  }
+
+  .saved-item:hover { border-color: var(--accent); }
+  .saved-item.active-slot { border-color: var(--accent); background: rgba(232,255,71,0.05); }
+
+  .saved-item-info { flex: 1; min-width: 0; }
+
+  .saved-item-name {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .saved-item-meta {
+    font-family: var(--mono);
+    font-size: 0.58rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .saved-item-actions {
+    display: flex;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  .icon-btn {
+    background: transparent;
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 0.25rem 0.4rem;
+    font-size: 0.65rem;
+    cursor: pointer;
+    color: var(--muted);
+    transition: all 0.12s;
+    font-family: var(--mono);
+  }
+
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .icon-btn.del:hover { border-color: var(--danger); color: var(--danger); }
+
+  .saved-empty {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 1rem 0;
+    font-style: italic;
+  }
+
+  .slots-counter {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+  }
+
+  .slots-counter span { color: var(--accent); font-weight: 700; }
+
+  /* ── Modal overlay ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal-box {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 340px;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .modal-title {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    text-transform: uppercase;
+  }
+
+  .modal-sub {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+    line-height: 1.5;
+  }
+
+  .modal-input {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    border-radius: 6px;
+    padding: 0.6rem 0.75rem;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    outline: none;
+  }
+
+  .modal-input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(232,255,71,0.1); }
+
+  .modal-preview {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.625rem 0.75rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.25rem 1rem;
+  }
+
+  .modal-preview-row {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+  }
+
+  .modal-preview-row .pk { color: var(--muted); }
+  .modal-preview-row .pv { color: var(--accent); font-weight: 700; }
+
+  /* ── Scrollbars ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* ── Animations ── */
+  @keyframes pulse-ring {
+    0% { box-shadow: 0 0 0 0 rgba(232,255,71,0.3); }
+    70% { box-shadow: 0 0 0 8px rgba(232,255,71,0); }
+    100% { box-shadow: 0 0 0 0 rgba(232,255,71,0); }
+  }
+
+  .pulse { animation: pulse-ring 1.5s ease infinite; }
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>
+        <circle cx="12" cy="12" r="9"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">OdoWheel Pro</div>
+      <span class="logo-sub">SCROLL &amp; POINTER ODOMETER</span>
+    </div>
+  </div>
+  <div id="header-status">
+    <span class="status-dot"></span>
+    <span id="header-status-text">CALIBRATED &amp; READY</span>
+  </div>
+</header>
+
+<!-- ══ MAIN ══ -->
+<main>
+
+  <!-- LEFT PANEL -->
+  <aside class="left-panel">
+
+    <!-- Hardware Specs -->
+    <div class="panel-section">
+      <div class="panel-section-header">
+        <span class="dot" style="background:var(--accent)"></span>
+        Hardware Specs
+      </div>
+      <div class="panel-body">
+        <div class="field-row">
+          <div class="field-label">Wheel Diameter</div>
+          <div class="input-wrap">
+            <input type="number" id="diameter-input" value="2.42" step="0.01" min="0.1">
+            <span class="input-suffix">cm</span>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Wheel Circumference (C = π × d)</div>
+          <div class="input-wrap">
+            <input type="number" id="circumference-input" value="7.60" step="0.01" min="0.1">
+            <span class="input-suffix">cm</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="field-row">
+          <div class="ticks-row">
+            <div class="field-label">Wheel Ticks / 360°</div>
+            <div class="ticks-number-wrap">
+              <input type="number" id="ticks-number-input" value="24" min="4" max="120" step="1">
+              <span class="ticks-unit">notches</span>
+            </div>
+          </div>
+          <input type="range" id="ticks-input" min="4" max="120" value="24" step="1">
+          <div class="preset-grid" style="margin-top:0.375rem">
+            <button class="preset-btn" data-ticks="18">18</button>
+            <button class="preset-btn active" data-ticks="24">24</button>
+            <button class="preset-btn" data-ticks="27">27</button>
+            <button class="preset-btn" data-ticks="30">30</button>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="field-row">
+          <div class="field-label">Mouse DPI / Monitor PPI</div>
+          <div class="input-wrap">
+            <input type="number" id="ppi-input" value="1166" step="1" min="10" max="12000">
+            <span class="input-suffix">DPI</span>
+          </div>
+        </div>
+        <!-- Calibration Quality -->
+        <div style="border-top:1px solid var(--border);padding-top:0.75rem;margin-top:0.125rem">
+          <div class="field-label" style="margin-bottom:0.375rem">Calibration Quality</div>
+          <div id="calib-badge-val">Precision Configured</div>
+          <div id="calib-desc-val">Pre-calibrated with your custom 24-notch scroll specs.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Calibration Studio -->
+    <div class="panel-section">
+      <div class="tab-bar">
+        <button class="tab-btn active" id="tab-rotation">⟳ Rotation Mode</button>
+        <button class="tab-btn" id="tab-smart">∑ Smart Multi-Run</button>
+      </div>
+
+      <!-- Panel: Rotation -->
+      <div id="panel-rotation" class="panel-body">
+        <div class="hint-box">
+          <span class="hint-label">How it works</span>
+          <ol>
+            <li>Note a marker on your physical scroll wheel.</li>
+            <li>Click <strong>Start Scan</strong> below.</li>
+            <li>Scroll exactly one full 360° turn.</li>
+            <li>Click <strong>Lock &amp; Apply</strong> to calibrate.</li>
+          </ol>
+        </div>
+        <div id="calib-live-box" style="display:none">
+          <div class="live-box">
+            <div class="live-box-label">Live Notches Recorded</div>
+            <div class="live-box-value" id="calib-ticks-display">0</div>
+            <div class="live-box-sub">Spinning wheel…</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btn-start-calib">▶ Start Scan</button>
+          <button class="btn btn-secondary" id="btn-stop-calib" disabled>⊠ Lock &amp; Apply</button>
+        </div>
+      </div>
+
+      <!-- Panel: Smart Multi-Run -->
+      <div id="panel-smart" class="panel-body" style="display:none">
+        <div class="hint-box">
+          <span class="hint-label">Smart Multi-Run Calibration</span>
+          Scroll or slide a target physical distance multiple times. The system averages the runs to perfectly calibrate your config.
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem">
+          <div class="field-row">
+            <div class="field-label">Target Distance (cm)</div>
+            <input type="number" id="smart-dist-input" value="10" min="1" step="0.5"
+              style="width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;padding:0.45rem 0.6rem;color:var(--text);font-family:var(--mono);font-size:0.8rem;font-weight:700;outline:none">
+          </div>
+          <div class="field-row">
+            <div class="field-label">Run Count</div>
+            <select id="smart-runs-count">
+              <option value="2">2 Runs</option>
+              <option value="3" selected>3 Runs</option>
+              <option value="5">5 Runs</option>
+              <option value="10">10 Runs</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Calibrate Target</div>
+          <select id="smart-target-type">
+            <option value="size" selected>Size (Scroll Wheel cm)</option>
+            <option value="ticks">Ticks (Scroll Wheel)</option>
+            <option value="ppi">DPI / Monitor PPI</option>
+          </select>
+        </div>
+        <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:0.75rem;display:flex;flex-direction:column;gap:0.5rem">
+          <div class="smart-progress-row">
+            <span id="smart-progress-text">Ready to Calibrate</span>
+            <span id="smart-runs-done">0/3 Done</span>
+          </div>
+          <div id="smart-live-box" style="display:none">
+            <div class="live-box">
+              <div class="live-box-label">Live Run Activity</div>
+              <div class="live-box-value" id="smart-live-ticks">0</div>
+              <div class="live-box-sub">Move exactly <span class="smart-target-dist-label">10</span> cm, then record.</div>
+            </div>
+          </div>
+          <div class="runs-list" id="smart-runs-list">
+            <div class="runs-empty">No recorded runs yet</div>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btn-start-smart">▶ Start Scan</button>
+          <button class="btn btn-secondary" id="btn-next-smart" disabled>⊞ Record Run</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saved Calibrations -->
+    <div class="panel-section">
+      <div class="panel-section-header" style="justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:0.5rem">
+          <span class="dot" style="background:var(--accent2)"></span>
+          Saved Calibrations
+        </div>
+        <span class="slots-counter"><span id="slots-used">0</span>/20 slots</span>
+      </div>
+      <div class="panel-body">
+        <div class="saved-list" id="saved-list">
+          <div class="saved-empty">No saved calibrations yet.</div>
+        </div>
+        <button class="btn btn-primary" id="btn-save-calib" style="width:100%">⊕ Save Current Config</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Save Modal -->
+  <div class="modal-overlay" id="save-modal">
+    <div class="modal-box">
+      <div>
+        <div class="modal-title">Save Calibration</div>
+        <div class="modal-sub">Give this configuration a name so you can recall it later.</div>
+      </div>
+      <input class="modal-input" id="modal-name-input" type="text" placeholder="e.g. Gaming Mouse 800 DPI" maxlength="40" autocomplete="off">
+      <div class="modal-preview" id="modal-preview">
+        <!-- filled by JS -->
+      </div>
+      <div style="display:flex;gap:0.5rem">
+        <button class="btn btn-secondary" id="modal-cancel" style="flex:1">Cancel</button>
+        <button class="btn btn-primary" id="modal-confirm" style="flex:1">⊕ Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <section class="right-panel">
+
+    <!-- Controls Bar -->
+    <div class="controls-bar">
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap">
+        <span style="font-family:var(--mono);font-size:0.6rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted)">Source:</span>
+        <div class="source-toggle">
+          <button class="source-btn active" id="source-scroll">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="5"/><line x1="12" y1="7" x2="12" y2="11"/><circle cx="12" cy="14" r="1"/></svg>
+            Scroll Wheel
+          </button>
+          <button class="source-btn" id="source-pointer">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l14 9-7 1-4 7z"/></svg>
+            Mouse Pointer
+          </button>
+        </div>
+        <button class="btn btn-success" id="btn-ptr-scan">▶ Start Pointer Scan</button>
+      </div>
+      <div class="action-bar-right">
+        <button class="btn btn-danger-outline" id="reset-btn">↺ Reset Distance</button>
+        <button class="btn btn-secondary" id="reset-all-btn">⊘ Restore Defaults</button>
+      </div>
+    </div>
+
+    <!-- Stat Cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label" id="primary-distance-label">Cumulative Path (Wheel)</div>
+        <div class="stat-value" id="dist-primary">0.00 <span>cm</span></div>
+        <div class="stat-footer">
+          <span id="dist-secondary-inch">0.00 in</span>
+          <span id="dist-secondary-m">0.000 m</span>
+        </div>
+        <div class="stat-watermark">∑</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" id="secondary-tracking-label">Wheel Rotations</div>
+        <div class="stat-value" id="rotations-val">0.00</div>
+        <div class="stat-footer">
+          <span id="total-notches-val">0 notch clicks</span>
+          <span style="color:var(--accent);display:flex;align-items:center;gap:0.3rem"><span id="active-dot" style="width:5px;height:5px;border-radius:50%;background:var(--accent);animation:blink 1s infinite"></span>Active</span>
+        </div>
+        <div class="stat-watermark">↻</div>
+      </div>
+      <div class="stat-card" style="border-right:none">
+        <div class="stat-label">Calibration Quality</div>
+        <div class="stat-value" style="font-size:1.1rem;line-height:1.3" id="calib-stat-badge">Precision Configured</div>
+        <div class="stat-footer" style="border-top:none;margin-top:0">
+          <span id="calib-stat-desc" style="color:var(--muted);font-family:var(--mono);font-size:0.6rem">Custom 24-notch specs</span>
+        </div>
+        <div class="stat-watermark">◎</div>
+      </div>
+    </div>
+
+    <!-- Unit Toggle -->
+    <div class="unit-bar">
+      <span class="unit-label">Display Units:</span>
+      <div class="unit-group">
+        <button class="unit-btn active" id="unit-cm">cm</button>
+        <button class="unit-btn" id="unit-m">m</button>
+        <button class="unit-btn" id="unit-inch">inch</button>
+      </div>
+    </div>
+
+    <!-- Canvas Area -->
+    <div class="canvas-area">
+      <div id="scroll-zone">
+        <div class="zone-icon" id="zone-icon-box" style="background:rgba(232,255,71,0.1);color:var(--accent)">
+          ↕
+        </div>
+        <div id="zone-title">Scroll Wheel Lab</div>
+        <p id="zone-desc">Place your cursor here and scroll up or down. Watch the wheel visualizer replicate your mechanical rotation.</p>
+        <div class="live-badge">
+          <span id="live-dot"></span>
+          <span id="live-indicator-text">Live capture active</span>
+        </div>
+      </div>
+
+      <div class="canvas-col">
+        <div class="canvas-col-label" id="visualizer-heading">Wheel Vector</div>
+        <div style="position:relative;display:flex;align-items:center;justify-content:center">
+          <canvas id="wheel-canvas" width="140" height="140"></canvas>
+          <div id="visualizer-indicator" style="position:absolute;top:-4px;width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:10px solid var(--danger)"></div>
+        </div>
+        <div class="spin-direction">DIR: <span id="spin-dir-val">IDLE</span></div>
+      </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span id="formula-text" style="font-family:var(--mono);font-size:0.65rem;color:var(--muted)">D = Rotations × Circumference</span>
+      <span id="status-text" style="font-family:var(--mono);font-size:0.65rem;color:var(--muted)">Preset calibrated to 24 ticks. Scroll to begin.</span>
+    </div>
+
+  </section>
+</main>
+
+<footer>OdoWheel Pro &mdash; Precision Scroll &amp; Pointer Odometer Suite</footer>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  DOM REFS
+// ══════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const diameterInput       = $('diameter-input');
+const circumferenceInput  = $('circumference-input');
+const ticksInput          = $('ticks-input');
+const ticksNumberInput    = $('ticks-number-input');
+const ppiInput            = $('ppi-input');
+const presetBtns          = document.querySelectorAll('.preset-btn');
+
+const unitCm   = $('unit-cm');
+const unitM    = $('unit-m');
+const unitInch = $('unit-inch');
+
+const distPrimary       = $('dist-primary');
+const distSecondaryInch = $('dist-secondary-inch');
+const distSecondaryM    = $('dist-secondary-m');
+const primaryDistLabel  = $('primary-distance-label');
+
+const rotationsVal      = $('rotations-val');
+const secondaryLabel    = $('secondary-tracking-label');
+const totalNotchesVal   = $('total-notches-val');
+
+const scrollZone        = $('scroll-zone');
+const zoneIconBox       = $('zone-icon-box');
+const zoneTitle         = $('zone-title');
+const zoneDesc          = $('zone-desc');
+const liveDot           = $('live-dot');
+const liveIndicatorText = $('live-indicator-text');
+
+const visualizerHeading    = $('visualizer-heading');
+const visualizerIndicator  = $('visualizer-indicator');
+
+const resetBtn    = $('reset-btn');
+const resetAllBtn = $('reset-all-btn');
+const statusText  = $('status-text');
+const headerStatusText = $('header-status-text');
+const spinDirVal  = $('spin-dir-val');
+const formulaText = $('formula-text');
+
+const sourceScroll  = $('source-scroll');
+const sourcePointer = $('source-pointer');
+const btnPtrScan    = $('btn-ptr-scan');
+
+const wheelCanvas = $('wheel-canvas');
+const ctx = wheelCanvas.getContext('2d');
+
+const tabRotation = $('tab-rotation');
+const tabSmart    = $('tab-smart');
+const panelRotation = $('panel-rotation');
+const panelSmart    = $('panel-smart');
+
+const btnStartCalib       = $('btn-start-calib');
+const btnStopCalib        = $('btn-stop-calib');
+const calibLiveBox        = $('calib-live-box');
+const calibTicksDisplay   = $('calib-ticks-display');
+
+const btnStartSmart    = $('btn-start-smart');
+const btnNextSmart     = $('btn-next-smart');
+const smartDistInput   = $('smart-dist-input');
+const smartRunsCount   = $('smart-runs-count');
+const smartTargetType  = $('smart-target-type');
+const smartProgressText= $('smart-progress-text');
+const smartRunsDone    = $('smart-runs-done');
+const smartLiveBox     = $('smart-live-box');
+const smartLiveTicks   = $('smart-live-ticks');
+const smartRunsList    = $('smart-runs-list');
+const smartTargetLabels= document.querySelectorAll('.smart-target-dist-label');
+
+const calibBadgeVal = $('calib-badge-val');
+const calibDescVal  = $('calib-desc-val');
+const calibStatBadge= $('calib-stat-badge');
+const calibStatDesc = $('calib-stat-desc');
+
+// ══════════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════════
+let diameter         = 2.42;
+let circumference    = 7.60;
+let ticksPerRotation = 24;
+let ppi              = 1166;
+
+let activeSource       = 'scroll';
+let currentUnit        = 'cm';
+let isPointerScanActive= false;
+
+let accumulatedNotches      = 0;
+let accumulatedPointerPixels= 0;
+let visualRotationAngle     = 0;
+
+let lastPointerX = null;
+let lastPointerY = null;
+
+let isCalibratingRotation = false;
+let isCalibratingSmart    = false;
+let calibrationNotches    = 0;
+let smartRecordedRuns     = [];
+let smartActiveRunIndex   = 1;
+let smartActiveRunTicks   = 0;
+let calibrationQuality    = "Custom Ticks";
+
+// ══════════════════════════════════════════════════════
+//  BUG FIX: Guard flag prevents mutual-trigger loop
+// ══════════════════════════════════════════════════════
+let _syncingInputs = false;
+
+function syncFromDiameter() {
+  if (_syncingInputs) return;
+  _syncingInputs = true;
+  diameter = parseFloat(diameterInput.value) || 0;
+  circumference = diameter * Math.PI;
+  circumferenceInput.value = circumference.toFixed(2);
+  _syncingInputs = false;
+  updateDashboard();
+}
+
+function syncFromCircumference() {
+  if (_syncingInputs) return;
+  _syncingInputs = true;
+  circumference = parseFloat(circumferenceInput.value) || 0;
+  diameter = circumference / Math.PI;
+  diameterInput.value = diameter.toFixed(2);
+  _syncingInputs = false;
+  updateDashboard();
+}
+
+// ══════════════════════════════════════════════════════
+//  CANVAS
+// ══════════════════════════════════════════════════════
+function drawWheel(angle) {
+  const sz = wheelCanvas.width;
+  const c  = sz / 2;
+  const r  = sz * 0.42;
+  ctx.clearRect(0, 0, sz, sz);
+
+  if (activeSource === 'scroll') {
+    // Tire
+    ctx.shadowColor = 'rgba(232,255,71,0.25)';
+    ctx.shadowBlur  = 12;
+    ctx.beginPath();
+    ctx.arc(c, c, r, 0, Math.PI*2);
+    ctx.fillStyle = '#1a1c1f';
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Rim
+    ctx.beginPath();
+    ctx.arc(c, c, r * 0.72, 0, Math.PI*2);
+    ctx.fillStyle = '#252830';
+    ctx.fill();
+
+    ctx.beginPath();
+    ctx.arc(c, c, r * 0.72, 0, Math.PI*2);
+    ctx.strokeStyle = '#3a3e48';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Notches
+    for (let i = 0; i < ticksPerRotation; i++) {
+      const a = angle + (i * (Math.PI*2 / ticksPerRotation));
+      ctx.beginPath();
+      ctx.moveTo(c + Math.cos(a)*(r-2), c + Math.sin(a)*(r-2));
+      ctx.lineTo(c + Math.cos(a)*(r-9), c + Math.sin(a)*(r-9));
+      ctx.strokeStyle = '#e8ff47';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Marker dot
+    const mx = c + Math.cos(angle) * (r * 0.6);
+    const my = c + Math.sin(angle) * (r * 0.6);
+    ctx.beginPath();
+    ctx.arc(mx, my, 5, 0, Math.PI*2);
+    ctx.fillStyle = '#ff4d6d';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Hub
+    ctx.beginPath();
+    ctx.arc(c, c, 7, 0, Math.PI*2);
+    ctx.fillStyle = '#0e0f11';
+    ctx.fill();
+    ctx.strokeStyle = '#e8ff47';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+  } else {
+    // Radar / pointer mode
+    const col = isPointerScanActive ? '#47ffd4' : '#4b5563';
+    ctx.shadowColor = isPointerScanActive ? 'rgba(71,255,212,0.25)' : 'transparent';
+    ctx.shadowBlur  = 12;
+
+    [1, 0.7, 0.4].forEach((scale, i) => {
+      ctx.beginPath();
+      ctx.arc(c, c, r*scale, 0, Math.PI*2);
+      ctx.strokeStyle = col;
+      ctx.lineWidth = i === 0 ? 2 : 1;
+      ctx.globalAlpha = i === 0 ? 0.8 : 0.3;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    });
+    ctx.shadowBlur = 0;
+
+    // Crosshair
+    ctx.beginPath();
+    ctx.moveTo(c-r, c); ctx.lineTo(c+r, c);
+    ctx.moveTo(c, c-r); ctx.lineTo(c, c+r);
+    ctx.strokeStyle = isPointerScanActive ? 'rgba(71,255,212,0.15)' : 'rgba(75,85,99,0.2)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Sweep line
+    const bx = c + Math.cos(angle)*r;
+    const by = c + Math.sin(angle)*r;
+    ctx.beginPath();
+    ctx.moveTo(c,c); ctx.lineTo(bx, by);
+    ctx.strokeStyle = isPointerScanActive ? '#47ffd4' : '#6b7280';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Blip
+    ctx.beginPath();
+    ctx.arc(bx, by, 5, 0, Math.PI*2);
+    ctx.fillStyle = isPointerScanActive ? '#ff4d6d' : '#6b7280';
+    ctx.fill();
+
+    // Center
+    ctx.beginPath();
+    ctx.arc(c, c, 4, 0, Math.PI*2);
+    ctx.fillStyle = isPointerScanActive ? '#47ffd4' : '#6b7280';
+    ctx.fill();
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  DASHBOARD UPDATE
+// ══════════════════════════════════════════════════════
+function updateDashboard() {
+  let primaryCm = 0;
+
+  if (activeSource === 'scroll') {
+    const rotations = accumulatedNotches / ticksPerRotation;
+    primaryCm = rotations * circumference;
+    primaryDistLabel.textContent    = 'Cumulative Path (Wheel)';
+    secondaryLabel.textContent      = 'Wheel Rotations';
+    rotationsVal.textContent        = rotations.toFixed(2);
+    totalNotchesVal.textContent     = `${accumulatedNotches} notch clicks`;
+    formulaText.textContent         = 'D = Rotations × Circumference  |  C = π × d';
+  } else {
+    primaryCm = (accumulatedPointerPixels / ppi) * 2.54;
+    primaryDistLabel.textContent    = 'Cumulative Path (Pointer)';
+    secondaryLabel.textContent      = 'Cursor Movement';
+    rotationsVal.textContent        = `${Math.round(accumulatedPointerPixels)} px`;
+    totalNotchesVal.textContent     = 'Relative pixel delta';
+    formulaText.textContent         = 'Distance = (pixels / DPI) × 2.54';
+  }
+
+  const distM    = primaryCm / 100;
+  const distInch = primaryCm / 2.54;
+
+  if (currentUnit === 'cm') {
+    distPrimary.innerHTML = `${primaryCm.toFixed(2)} <span>cm</span>`;
+  } else if (currentUnit === 'm') {
+    distPrimary.innerHTML = `${distM.toFixed(4)} <span>m</span>`;
+  } else {
+    distPrimary.innerHTML = `${distInch.toFixed(2)} <span>in</span>`;
+  }
+
+  distSecondaryInch.textContent = `${distInch.toFixed(2)} in`;
+  distSecondaryM.textContent    = `${distM.toFixed(3)} m`;
+
+  drawWheel(visualRotationAngle);
+  updateCalibBadge();
+}
+
+function updateCalibBadge() {
+  let label, desc;
+  if (calibrationQuality === 'Full Linear') {
+    label = '◎ Precision Ruler';
+    desc  = 'Multi-run linear calibration complete. Parameters averaged.';
+  } else if (calibrationQuality === 'Custom Ticks') {
+    label = '◈ Precision Configured';
+    desc  = activeSource === 'scroll'
+      ? `Custom ${ticksPerRotation}-notch scroll specs.`
+      : `Custom ${ppi} DPI pixel scaling.`;
+  } else {
+    label = '◇ Standard';
+    desc  = 'Using generic specs. Run a calibration for exact results.';
+  }
+  calibBadgeVal.textContent  = label;
+  calibDescVal.textContent   = desc;
+  calibStatBadge.textContent = label;
+  calibStatDesc.textContent  = desc;
+}
+
+// ══════════════════════════════════════════════════════
+//  TICKS SYNC
+// ══════════════════════════════════════════════════════
+function syncTickInputs(val) {
+  val = Math.max(4, Math.min(120, parseInt(val) || 24));
+  ticksPerRotation     = val;
+  ticksInput.value     = val;
+  ticksNumberInput.value = val;
+  presetBtns.forEach(btn => {
+    const active = parseInt(btn.dataset.ticks) === val;
+    btn.classList.toggle('active', active);
+  });
+  updateDashboard();
+}
+
+// ══════════════════════════════════════════════════════
+//  TRACKING SOURCE
+// ══════════════════════════════════════════════════════
+function setTrackingSource(source) {
+  activeSource = source;
+
+  if (source === 'scroll') {
+    sourceScroll.classList.add('active');
+    sourcePointer.classList.remove('active');
+    btnPtrScan.style.display = 'none';
+
+    zoneIconBox.style.cssText = 'background:rgba(232,255,71,0.1);color:var(--accent);width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:0.875rem;font-size:1.5rem';
+    zoneIconBox.textContent = '↕';
+    zoneTitle.textContent   = 'Scroll Wheel Lab';
+    zoneDesc.textContent    = 'Place your cursor here and scroll up or down. Watch the wheel visualizer replicate your mechanical rotation.';
+
+    liveDot.classList.remove('active');
+    liveDot.style.background = 'var(--accent)';
+    liveDot.classList.add('active');
+    liveIndicatorText.textContent = 'Live capture active';
+
+    visualizerHeading.textContent    = 'Wheel Vector';
+    visualizerIndicator.style.display= '';
+
+    scrollZone.className = 'active-scroll';
+    scrollZone.id = 'scroll-zone';
+
+    if (isPointerScanActive) {
+      isPointerScanActive = false;
+      if (document.pointerLockElement === scrollZone) document.exitPointerLock();
+    }
+    statusText.textContent = 'Switched source → Scroll Wheel';
+  } else {
+    sourcePointer.classList.add('active');
+    sourceScroll.classList.remove('active');
+    btnPtrScan.style.display = 'flex';
+    isPointerScanActive = false;
+    btnPtrScan.innerHTML = '▶ Start Pointer Scan';
+    btnPtrScan.className = 'btn btn-success';
+
+    zoneIconBox.style.cssText = 'background:rgba(71,255,212,0.1);color:var(--accent2);width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:0.875rem;font-size:1.5rem';
+    zoneIconBox.textContent = '⊹';
+    zoneTitle.textContent   = 'Pointer Gliding Space';
+    zoneDesc.innerHTML      = 'Click <strong>Start Pointer Scan</strong> above first. Then glide freely — pointer lock enables infinite desk tracking.';
+
+    liveDot.classList.remove('active');
+    liveDot.style.background = 'var(--muted)';
+    liveIndicatorText.textContent = 'Pointer scan suspended';
+
+    visualizerHeading.textContent    = 'Radar Vector';
+    visualizerIndicator.style.display= 'none';
+    statusText.textContent = 'Switched source → Mouse Pointer';
+  }
+  updateDashboard();
+}
+
+// ══════════════════════════════════════════════════════
+//  POINTER SCAN TOGGLE
+// ══════════════════════════════════════════════════════
+function togglePointerScan() {
+  isPointerScanActive = !isPointerScanActive;
+  if (isPointerScanActive) {
+    btnPtrScan.innerHTML  = '⊠ Stop Scan';
+    btnPtrScan.className  = 'btn btn-danger-outline';
+    liveDot.style.background = 'var(--accent2)';
+    liveDot.classList.add('active');
+    liveIndicatorText.textContent = 'Live pointer scan active — move mouse freely';
+    lastPointerX = null; lastPointerY = null; // reset so first move doesn't produce a stale jump
+    // Request pointer lock for unlimited desk tracking; scan works even if browser denies it
+    scrollZone.requestPointerLock().catch(() => {});
+  } else {
+    btnPtrScan.innerHTML  = '▶ Start Pointer Scan';
+    btnPtrScan.className  = 'btn btn-success';
+    liveDot.style.background = 'var(--muted)';
+    liveDot.classList.remove('active');
+    liveIndicatorText.textContent = 'Pointer scan suspended';
+    if (document.pointerLockElement === scrollZone) document.exitPointerLock();
+  }
+  updateDashboard();
+}
+
+// ══════════════════════════════════════════════════════
+//  SCROLL HANDLER
+// ══════════════════════════════════════════════════════
+let scrollEndTimer;
+function handleScrollWheel(e) {
+  e.preventDefault();
+  if (e.deltaY === 0) return;
+
+  const step = Math.sign(e.deltaY);
+  accumulatedNotches += Math.abs(step);
+  visualRotationAngle += (step * (Math.PI*2)) / ticksPerRotation;
+
+  if (isCalibratingRotation) {
+    calibrationNotches += Math.abs(step);
+    calibTicksDisplay.textContent = calibrationNotches;
+  }
+  if (isCalibratingSmart && smartTargetType.value !== 'ppi') {
+    smartActiveRunTicks += Math.abs(step);
+    smartLiveTicks.textContent = smartActiveRunTicks;
+  }
+
+  if (activeSource === 'scroll') {
+    spinDirVal.textContent = step > 0 ? 'DOWN' : 'UP';
+    spinDirVal.style.color = 'var(--accent)';
+    statusText.textContent = 'Live scroll tracking active';
+    updateDashboard();
+
+    clearTimeout(scrollEndTimer);
+    scrollEndTimer = setTimeout(() => {
+      spinDirVal.textContent = 'IDLE';
+      spinDirVal.style.color = 'var(--muted)';
+      statusText.textContent = 'Listening to scroll wheel…';
+    }, 800);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  POINTER HANDLER
+// ══════════════════════════════════════════════════════
+let pointerEndTimer;
+function handlePointerMove(e) {
+  if (activeSource !== 'pointer') return;
+  let delta = 0;
+  const locked = document.pointerLockElement === scrollZone;
+
+  if (locked) {
+    // Pointer lock: use raw hardware movement deltas (unlimited, no screen boundary)
+    delta = Math.sqrt(e.movementX*e.movementX + e.movementY*e.movementY);
+  } else {
+    // Fallback: compute delta from screen coordinates.
+    // Always update lastPointer so the next event has a valid reference.
+    if (lastPointerX !== null && lastPointerY !== null) {
+      const dx = e.clientX - lastPointerX;
+      const dy = e.clientY - lastPointerY;
+      delta = Math.sqrt(dx*dx + dy*dy);
+    }
+    lastPointerX = e.clientX;
+    lastPointerY = e.clientY;
+  }
+
+  if (delta > 0 && isPointerScanActive) {
+    accumulatedPointerPixels += delta;
+    visualRotationAngle      += delta * 0.05;
+
+    if (isCalibratingSmart && smartTargetType.value === 'ppi') {
+      smartActiveRunTicks += delta;
+      smartLiveTicks.textContent = Math.round(smartActiveRunTicks);
+    }
+
+    spinDirVal.textContent = 'MOVE';
+    spinDirVal.style.color = 'var(--accent2)';
+    statusText.textContent = locked
+      ? 'Pointer locked — infinite tracking (ESC to unlock)'
+      : 'Live pointer tracking active';
+    updateDashboard();
+
+    clearTimeout(pointerEndTimer);
+    pointerEndTimer = setTimeout(() => {
+      spinDirVal.textContent = 'IDLE';
+      spinDirVal.style.color = 'var(--muted)';
+      statusText.textContent = locked
+        ? 'Pointer locked — infinite tracking (ESC to unlock)'
+        : 'Listening to pointer gliding…';
+    }, 500);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  CALIBRATION — ROTATION MODE
+// ══════════════════════════════════════════════════════
+btnStartCalib.addEventListener('click', () => {
+  isCalibratingRotation  = true;
+  calibrationNotches     = 0;
+  calibTicksDisplay.textContent = '0';
+  calibLiveBox.style.display   = '';
+  btnStartCalib.disabled = true;
+  btnStopCalib.disabled  = false;
+  btnStopCalib.className = 'btn btn-success';
+  headerStatusText.textContent  = 'CALIBRATING TICKS…';
+});
+
+btnStopCalib.addEventListener('click', () => {
+  isCalibratingRotation  = false;
+  if (calibrationNotches >= 4) {
+    syncTickInputs(calibrationNotches);
+    calibrationQuality = 'Custom Ticks';
+  }
+  calibLiveBox.style.display  = 'none';
+  btnStartCalib.disabled = false;
+  btnStopCalib.disabled  = true;
+  btnStopCalib.className = 'btn btn-secondary';
+  headerStatusText.textContent = 'TICKS CALIBRATED';
+  updateDashboard();
+});
+
+// ══════════════════════════════════════════════════════
+//  CALIBRATION — SMART MULTI-RUN
+// ══════════════════════════════════════════════════════
+smartDistInput.addEventListener('input', () => {
+  const val = parseFloat(smartDistInput.value) || 10;
+  smartTargetLabels.forEach(l => l.textContent = val);
+});
+
+btnStartSmart.addEventListener('click', () => {
+  isCalibratingSmart   = true;
+  smartRecordedRuns    = [];
+  smartActiveRunIndex  = 1;
+  smartActiveRunTicks  = 0;
+
+  const total = parseInt(smartRunsCount.value);
+  smartRunsDone.textContent    = `0/${total} Done`;
+  smartProgressText.textContent= `Run 1 of ${total} active`;
+  smartLiveTicks.textContent   = '0';
+  smartLiveBox.style.display   = '';
+  smartRunsList.innerHTML      = '';
+
+  smartDistInput.disabled   = true;
+  smartRunsCount.disabled   = true;
+  smartTargetType.disabled  = true;
+  btnStartSmart.disabled    = true;
+  btnStartSmart.className   = 'btn btn-secondary';
+  btnNextSmart.disabled     = false;
+  btnNextSmart.className    = 'btn btn-primary';
+
+  headerStatusText.textContent = `CALIBRATION RUN 1…`;
+});
+
+btnNextSmart.addEventListener('click', () => {
+  if (!isCalibratingSmart) return;
+
+  const total     = parseInt(smartRunsCount.value);
+  const targetDist= parseFloat(smartDistInput.value) || 10;
+  const unitLabel = smartTargetType.value === 'ppi' ? 'px' : 'notches';
+
+  smartRecordedRuns.push(smartActiveRunTicks);
+
+  const row = document.createElement('div');
+  row.className = 'run-row';
+  row.innerHTML = `<span class="run-label">Run ${smartActiveRunIndex}</span><span class="run-val">${Math.round(smartActiveRunTicks)} ${unitLabel}</span>`;
+  smartRunsList.appendChild(row);
+  smartRunsList.scrollTop = smartRunsList.scrollHeight;
+
+  smartRunsDone.textContent = `${smartActiveRunIndex}/${total} Done`;
+
+  if (smartActiveRunIndex < total) {
+    smartActiveRunIndex++;
+    smartActiveRunTicks = 0;
+    smartLiveTicks.textContent    = '0';
+    smartProgressText.textContent = `Run ${smartActiveRunIndex} of ${total} active`;
+    headerStatusText.textContent  = `CALIBRATION RUN ${smartActiveRunIndex}…`;
+  } else {
+    isCalibratingSmart = false;
+    const avg = smartRecordedRuns.reduce((a,b)=>a+b,0) / total;
+    const target = smartTargetType.value;
+
+    if (target === 'size') {
+      const computedCircumference = (targetDist * ticksPerRotation) / avg;
+      // Use flag to avoid recursive loop when setting circumference programmatically
+      _syncingInputs = true;
+      circumferenceInput.value = computedCircumference.toFixed(2);
+      circumference = computedCircumference;
+      diameter = circumference / Math.PI;
+      diameterInput.value = diameter.toFixed(2);
+      _syncingInputs = false;
+      calibrationQuality = 'Full Linear';
+    } else if (target === 'ticks') {
+      syncTickInputs(Math.round((avg * circumference) / targetDist));
+      calibrationQuality = 'Custom Ticks';
+    } else if (target === 'ppi') {
+      ppi = Math.round((avg * 2.54) / targetDist);
+      ppiInput.value = ppi;
+      calibrationQuality = 'Custom Ticks';
+    }
+
+    smartLiveBox.style.display    = 'none';
+    smartProgressText.textContent = 'Calibration Complete!';
+    smartProgressText.style.color = 'var(--accent2)';
+
+    const summary = document.createElement('div');
+    summary.className = 'run-summary';
+    summary.textContent = `✓ Avg: ${avg.toFixed(1)} ${unitLabel} — config adjusted.`;
+    smartRunsList.appendChild(summary);
+
+    smartDistInput.disabled  = false;
+    smartRunsCount.disabled  = false;
+    smartTargetType.disabled = false;
+    btnStartSmart.disabled   = false;
+    btnStartSmart.className  = 'btn btn-primary';
+    btnNextSmart.disabled    = true;
+    btnNextSmart.className   = 'btn btn-secondary';
+    headerStatusText.textContent = 'CALIBRATED & READY';
+
+    updateDashboard();
+  }
+});
+
+// ══════════════════════════════════════════════════════
+//  UNIT BUTTONS
+// ══════════════════════════════════════════════════════
+[unitCm, unitM, unitInch].forEach(btn => {
+  btn.addEventListener('click', () => {
+    [unitCm, unitM, unitInch].forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentUnit = btn.id.replace('unit-', '');
+    updateDashboard();
+  });
+});
+
+// ══════════════════════════════════════════════════════
+//  SOURCE BUTTONS
+// ══════════════════════════════════════════════════════
+sourceScroll.addEventListener('click',  () => setTrackingSource('scroll'));
+sourcePointer.addEventListener('click', () => setTrackingSource('pointer'));
+btnPtrScan.addEventListener('click', togglePointerScan);
+
+// ══════════════════════════════════════════════════════
+//  SCROLL ZONE EVENTS
+// ══════════════════════════════════════════════════════
+scrollZone.addEventListener('wheel',     handleScrollWheel, { passive: false });
+scrollZone.addEventListener('mousemove', handlePointerMove, { passive: true });
+// Document-level listener catches pointer-locked movementX/Y deltas anywhere on screen
+document.addEventListener('mousemove', (e) => {
+  if (document.pointerLockElement === scrollZone) handlePointerMove(e);
+}, { passive: true });
+
+['mousedown','mouseup','click','contextmenu'].forEach(type => {
+  scrollZone.addEventListener(type, e => {
+    if (activeSource === 'pointer' && type === 'click' && e.button === 0) {
+      if (isPointerScanActive && document.pointerLockElement !== scrollZone) {
+        scrollZone.requestPointerLock();
+      } else if (!isPointerScanActive) {
+        togglePointerScan();
+      }
+      return;
+    }
+    e.preventDefault();
+    e.stopPropagation();
+  }, { passive: false });
+});
+
+// ══════════════════════════════════════════════════════
+//  POINTER LOCK CHANGE
+// ══════════════════════════════════════════════════════
+document.addEventListener('pointerlockchange', () => {
+  if (document.pointerLockElement !== scrollZone && isPointerScanActive) {
+    togglePointerScan();
+  }
+  lastPointerX = null;
+  lastPointerY = null;
+  updateDashboard();
+});
+
+// ══════════════════════════════════════════════════════
+//  RESET BUTTONS
+// ══════════════════════════════════════════════════════
+resetBtn.addEventListener('click', () => {
+  accumulatedNotches       = 0;
+  accumulatedPointerPixels = 0;
+  visualRotationAngle      = 0;
+  lastPointerX = null;
+  lastPointerY = null;
+  if (isCalibratingRotation) { calibrationNotches = 0; calibTicksDisplay.textContent = '0'; }
+  if (isCalibratingSmart)    { smartActiveRunTicks = 0; smartLiveTicks.textContent = '0'; }
+  updateDashboard();
+  statusText.textContent = 'Distance & count cleared.';
+  setTimeout(() => { statusText.textContent = 'Ready to track.'; }, 1500);
+});
+
+resetAllBtn.addEventListener('click', () => {
+  accumulatedNotches = 0; accumulatedPointerPixels = 0; visualRotationAngle = 0;
+  isCalibratingRotation = false; isCalibratingSmart = false; isPointerScanActive = false;
+  calibrationNotches = 0; smartRecordedRuns = []; lastPointerX = null; lastPointerY = null;
+
+  _syncingInputs = true;
+  diameterInput.value = '2.42';       diameter = 2.42;
+  circumferenceInput.value = '7.60';  circumference = 7.60;
+  _syncingInputs = false;
+
+  ppiInput.value = '1166'; ppi = 1166;
+  syncTickInputs(24);
+  calibrationQuality = 'Custom Ticks';
+
+  calibLiveBox.style.display  = 'none';
+  smartLiveBox.style.display  = 'none';
+  smartRunsList.innerHTML     = '<div class="runs-empty">No recorded runs yet</div>';
+  smartRunsDone.textContent   = '0/3 Done';
+  smartProgressText.textContent = 'Ready to Calibrate';
+  smartProgressText.style.color = '';
+
+  smartDistInput.disabled = false; smartRunsCount.disabled = false; smartTargetType.disabled = false;
+  btnStartCalib.disabled = false; btnStartCalib.className = 'btn btn-primary';
+  btnStopCalib.disabled  = true;  btnStopCalib.className  = 'btn btn-secondary';
+  btnStartSmart.disabled = false; btnStartSmart.className = 'btn btn-primary';
+  btnNextSmart.disabled  = true;  btnNextSmart.className  = 'btn btn-secondary';
+
+  headerStatusText.textContent = 'CALIBRATED & READY';
+  if (document.pointerLockElement === scrollZone) document.exitPointerLock();
+
+  setTrackingSource('scroll');
+  updateDashboard();
+  statusText.textContent = 'All parameters restored to defaults.';
+  setTimeout(() => { statusText.textContent = 'Ready to track.'; }, 1500);
+});
+
+// ══════════════════════════════════════════════════════
+//  CALIBRATION TABS
+// ══════════════════════════════════════════════════════
+tabRotation.addEventListener('click', () => {
+  tabRotation.classList.add('active'); tabSmart.classList.remove('active');
+  panelRotation.style.display = ''; panelSmart.style.display = 'none';
+});
+tabSmart.addEventListener('click', () => {
+  tabSmart.classList.add('active'); tabRotation.classList.remove('active');
+  panelSmart.style.display = ''; panelRotation.style.display = 'none';
+});
+
+// ══════════════════════════════════════════════════════
+//  INPUT LISTENERS  (with sync-guard already in place)
+// ══════════════════════════════════════════════════════
+diameterInput.addEventListener('input', () => {
+  calibrationQuality = 'Standard';
+  syncFromDiameter();
+});
+
+circumferenceInput.addEventListener('input', () => {
+  calibrationQuality = 'Standard';
+  syncFromCircumference();
+});
+
+ticksInput.addEventListener('input', e => {
+  syncTickInputs(e.target.value);
+  calibrationQuality = 'Standard';
+});
+
+ticksNumberInput.addEventListener('input', e => {
+  syncTickInputs(e.target.value);
+  calibrationQuality = 'Standard';
+});
+
+ppiInput.addEventListener('input', e => {
+  ppi = parseFloat(e.target.value) || 96;
+  calibrationQuality = 'Standard';
+  updateDashboard();
+});
+
+presetBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    syncTickInputs(btn.dataset.ticks);
+    calibrationQuality = 'Custom Ticks';
+  });
+});
+
+// ══════════════════════════════════════════════════════
+//  SAVED CALIBRATIONS
+// ══════════════════════════════════════════════════════
+const STORAGE_KEY   = 'odowheel_calibrations';
+const MAX_SLOTS     = 20;
+
+const savedList     = $('saved-list');
+const slotsUsed     = $('slots-used');
+const btnSaveCalib  = $('btn-save-calib');
+const saveModal     = $('save-modal');
+const modalNameInput= $('modal-name-input');
+const modalPreview  = $('modal-preview');
+const modalCancel   = $('modal-cancel');
+const modalConfirm  = $('modal-confirm');
+
+let activeSlotId    = null; // id of currently loaded slot
+
+function loadSavedCalibrations() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
+  catch { return []; }
+}
+
+function persistCalibrations(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+function currentConfig() {
+  return {
+    diameter:        +diameter.toFixed(3),
+    circumference:   +circumference.toFixed(3),
+    ticksPerRotation,
+    ppi,
+    calibrationQuality,
+    source: activeSource,
+  };
+}
+
+function applyConfig(cfg) {
+  _syncingInputs = true;
+  diameter = cfg.diameter;
+  circumference = cfg.circumference;
+  diameterInput.value = diameter.toFixed(2);
+  circumferenceInput.value = circumference.toFixed(2);
+  _syncingInputs = false;
+
+  ppi = cfg.ppi;
+  ppiInput.value = ppi;
+
+  calibrationQuality = cfg.calibrationQuality || 'Custom Ticks';
+  syncTickInputs(cfg.ticksPerRotation);
+  updateDashboard();
+}
+
+function configMeta(cfg) {
+  return `d=${cfg.diameter}cm  C=${cfg.circumference}cm  ${cfg.ticksPerRotation}t  ${cfg.ppi}DPI`;
+}
+
+function renderSavedList() {
+  const list = loadSavedCalibrations();
+  slotsUsed.textContent = list.length;
+  btnSaveCalib.disabled = list.length >= MAX_SLOTS;
+
+  if (list.length === 0) {
+    savedList.innerHTML = '<div class="saved-empty">No saved calibrations yet.</div>';
+    return;
+  }
+
+  savedList.innerHTML = '';
+  list.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'saved-item' + (item.id === activeSlotId ? ' active-slot' : '');
+    row.dataset.id = item.id;
+
+    row.innerHTML = `
+      <div class="saved-item-info">
+        <div class="saved-item-name">${escHtml(item.name)}</div>
+        <div class="saved-item-meta">${configMeta(item.config)}</div>
+      </div>
+      <div class="saved-item-actions">
+        <button class="icon-btn load-btn" title="Load">▶</button>
+        <button class="icon-btn del del-btn" title="Delete">✕</button>
+      </div>`;
+
+    row.querySelector('.load-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      loadSlot(item.id);
+    });
+
+    row.querySelector('.del-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      deleteSlot(item.id);
+    });
+
+    row.addEventListener('click', () => loadSlot(item.id));
+    savedList.appendChild(row);
+  });
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function loadSlot(id) {
+  const list = loadSavedCalibrations();
+  const item = list.find(i => i.id === id);
+  if (!item) return;
+  activeSlotId = id;
+  applyConfig(item.config);
+  statusText.textContent = `Loaded: ${item.name}`;
+  renderSavedList();
+}
+
+function deleteSlot(id) {
+  let list = loadSavedCalibrations();
+  list = list.filter(i => i.id !== id);
+  persistCalibrations(list);
+  if (activeSlotId === id) activeSlotId = null;
+  renderSavedList();
+  statusText.textContent = 'Calibration deleted.';
+}
+
+function openSaveModal() {
+  const cfg = currentConfig();
+  modalNameInput.value = '';
+  modalPreview.innerHTML = `
+    <div class="modal-preview-row"><span class="pk">Diameter</span><br><span class="pv">${cfg.diameter} cm</span></div>
+    <div class="modal-preview-row"><span class="pk">Circumference</span><br><span class="pv">${cfg.circumference} cm</span></div>
+    <div class="modal-preview-row"><span class="pk">Ticks / 360°</span><br><span class="pv">${cfg.ticksPerRotation}</span></div>
+    <div class="modal-preview-row"><span class="pk">DPI / PPI</span><br><span class="pv">${cfg.ppi}</span></div>
+    <div class="modal-preview-row"><span class="pk">Quality</span><br><span class="pv">${cfg.calibrationQuality}</span></div>
+    <div class="modal-preview-row"><span class="pk">Source</span><br><span class="pv">${cfg.source}</span></div>`;
+  saveModal.classList.add('open');
+  setTimeout(() => modalNameInput.focus(), 60);
+}
+
+function confirmSave() {
+  const name = modalNameInput.value.trim();
+  if (!name) { modalNameInput.focus(); return; }
+
+  const list = loadSavedCalibrations();
+  if (list.length >= MAX_SLOTS) {
+    statusText.textContent = 'Max 20 slots reached. Delete one first.';
+    closeSaveModal();
+    return;
+  }
+
+  const entry = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+    name,
+    savedAt: new Date().toISOString(),
+    config: currentConfig(),
+  };
+
+  list.push(entry);
+  persistCalibrations(list);
+  activeSlotId = entry.id;
+  closeSaveModal();
+  renderSavedList();
+  statusText.textContent = `Saved: "${name}"`;
+}
+
+function closeSaveModal() {
+  saveModal.classList.remove('open');
+}
+
+btnSaveCalib.addEventListener('click', openSaveModal);
+modalCancel.addEventListener('click', closeSaveModal);
+modalConfirm.addEventListener('click', confirmSave);
+saveModal.addEventListener('click', e => { if (e.target === saveModal) closeSaveModal(); });
+modalNameInput.addEventListener('keydown', e => { if (e.key === 'Enter') confirmSave(); if (e.key === 'Escape') closeSaveModal(); });
+
+// ══════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════
+syncFromDiameter();
+renderSavedList();
+</script>
+</body>
+</html>
