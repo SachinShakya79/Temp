@@ -108,7 +108,6 @@
                     githubUrl: "https://github.com/SachinShakya79/Temp/blob/main/OdoWheelPro%20live.html",
                 },
                 
-
 //More Projects can be added here by following the same structure as above:
 //=================================>
 
@@ -144,26 +143,67 @@
     </footer>
 
     <script>
-        // --- Router Logic ---
+        // --- Router & History Logic ---
         function navigateTo(page, projectId = null) {
+            // Instead of rendering directly, we update the URL Hash.
+            // This adds the page to the browser's history stack.
+            const hash = projectId ? `#project-detail/${projectId}` : `#${page}`;
+            
+            // If already on the page, force a re-render. Otherwise, change hash to trigger event.
+            if (window.location.hash === hash) {
+                renderPageFromHash();
+            } else {
+                window.location.hash = hash; 
+            }
+        }
+
+        // Listens to URL Hash changes ( triggered by navigateTo OR pressing Back/Forward arrows )
+        function renderPageFromHash() {
+            let hash = window.location.hash.replace('#', '');
+            if (!hash) hash = 'home';
+
+            let page = hash;
+            let projectId = null;
+
+            // Check if it's a project detail page
+            if (hash.startsWith('project-detail/')) {
+                page = 'project-detail';
+                projectId = hash.split('/')[1];
+            }
+
             const content = document.getElementById('app-content');
             content.innerHTML = ''; // Clear current content
             window.scrollTo(0, 0);
 
+            // Render matching section
             if (page === 'home') renderHome();
             else if (page === 'projects') renderProjects();
             else if (page === 'about') renderAbout();
             else if (page === 'contact') renderContact();
-            else if (page === 'project-detail') renderProjectDetail(projectId);
+            else if (page === 'project-detail' && projectId) renderProjectDetail(projectId);
+            else { page = 'home'; renderHome(); } // Fallback to home
 
             // Update Nav Active State
+            const activeNavTarget = page === 'project-detail' ? 'projects' : page;
             document.querySelectorAll('.nav-link').forEach(link => {
-                link.classList.toggle('text-sky-400', link.innerText.toLowerCase() === page);
+                link.classList.toggle('text-sky-400', link.innerText.toLowerCase() === activeNavTarget);
             });
             
             // Re-initialize icons
             lucide.createIcons();
         }
+
+        // Tie the browser's Back/Forward button directly to the render function
+        window.addEventListener('hashchange', renderPageFromHash);
+
+        // --- Exit Confirmation (BeforeUnload) ---
+        // Will prompt the user to confirm if they attempt to completely leave the domain/close the tab
+        window.addEventListener('beforeunload', function (e) {
+            // Cancel the event
+            e.preventDefault(); 
+            // Chrome requires returnValue to be set
+            e.returnValue = ''; 
+        });
 
         // --- Render Functions ---
 
@@ -198,7 +238,7 @@
                             </button>
                         </div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-                            ${PORTFOLIO_DATA.projects.slice(0, 3).map(p => createProjectCard(p)).join('')}
+                            ${PORTFOLIO_DATA.projects.slice(0, 4).map(p => createProjectCard(p)).join('')}
                         </div>
                     </section>
                 </div>
@@ -220,6 +260,8 @@
 
         function renderProjectDetail(id) {
             const project = PORTFOLIO_DATA.projects.find(p => p.id === id);
+            if (!project) return navigateTo('projects'); // fallback
+
             const app = document.getElementById('app-content');
             
             // Build the links conditionally so empty ones don't render buttons
@@ -350,7 +392,15 @@
         // --- Initialization ---
         window.onload = () => {
             document.getElementById('footer-copy').innerText = `© ${new Date().getFullYear()} ${PORTFOLIO_DATA.profile.name}. All rights reserved.`;
-            navigateTo('home');
+            
+            // Initial routing setup based on URL Hash
+            if (!window.location.hash) {
+                // If there's no hash, set it to home (this will trigger renderPageFromHash)
+                window.location.hash = '#home';
+            } else {
+                // If someone linked directly to an exact page (like /#projects), render it
+                renderPageFromHash();
+            }
         };
     </script>
 </body>
