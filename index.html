@@ -111,10 +111,18 @@
                     liveUrl: "OdoWheelPro live.html",
                     githubUrl: "https://github.com/SachinShakya79/Temp/blob/main/OdoWheelPro%20live.html",
                 },
-                
-//More Projects can be added here by following the same structure as above:
-//=================================>
-
+                {
+                    id: "project-5",
+                    featured: true, // Set to false to hide from Home page (will still show in Projects tab)
+                    title: "Smart Sign Language Glove",
+                    category: "Microcontroller / Third Semester Project",
+                    shortDesc: "A wearable glove that translates hand gestures into readable text using DIY flex sensors and an ESP32, helping bridge communication between sign language users and others.",
+                    fullDesc: "The Smart Sign Language Glove is a wearable assistive device developed as a third-semester project to help translate hand gestures into text in real time. The glove uses five DIY flex sensors connected to an ESP32 microcontroller to detect finger movements. Sensor values are processed, calibrated, and matched against predefined gestures, which are then displayed on a web interface over Wi-Fi.\n\nKey Technical Highlights:\n1. DIY Flex Sensors: Designed and built custom flex sensors using graphite, paper, aluminum foil, and heat-shrink tubing as a low-cost alternative to commercial sensors.\n2. ESP32 Web Server: Hosted a real-time web interface that displays recognized gestures wirelessly on any device connected to the same network.\n3. Gesture Recognition: Implemented a gesture dictionary that converts combinations of finger positions into readable words and phrases.\n4. Sensor Calibration: Developed guided and automatic calibration methods with EEPROM/Preferences storage to improve recognition accuracy across different users.\n5. Real-Time Processing: Continuously reads analog sensor values, filters noise using thresholds and dead zones, and updates recognized gestures with minimal latency.\n6. Cost-Effective Design: Built the entire prototype using affordable and easily available components, making it suitable for educational and accessibility-focused applications.\n\nFuture Improvements & Community Feedback:\n• Replace the DIY flex sensors with commercial flex sensors for higher accuracy and durability.\n• Add an MPU6050 (accelerometer + gyroscope) for wrist orientation and dynamic gesture recognition.\n• Integrate a speaker or DFPlayer Mini to provide voice output for recognized gestures.\n• Improve the gesture recognition algorithm and expand the vocabulary.\n\n💡 Have an idea? I'd love to hear it! If you have suggestions for improving the hardware, software, or accessibility features of this project, feel free to reach out or contribute.",
+                    tech: ["ESP32", "Embedded C++", "Arduino IDE", "HTML", "CSS", "JavaScript", "Wi-Fi Web Server", "Analog Sensors", "Flex Sensors"],
+                    image: "SSLG Preview.jpg",
+                    liveUrl: "SSLG Live.jpg",
+                    githubUrl: "https://github.com/SachinShakya79/Smart-Sign-Language-Glove.git",
+                }
             ],
             skills: ["C/C++", "Microcontrollers", "Web Development",  "Problem Solving", "Team Collaboration",]
         };
